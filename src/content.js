@@ -1,4 +1,5 @@
-const dataDiv = document.querySelector("#main-content > div");
-const props = JSON.parse(dataDiv.dataset["reactProps"]);
+let dataDiv = document.querySelector("#main-content > div");
+let props = JSON.parse(dataDiv.dataset['reactProps']);
+let urls = props.pages.map(page => page.url);
 
-props.rubric_items;
+console.log(urls);
