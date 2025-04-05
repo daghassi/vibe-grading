@@ -15,7 +15,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["www.gradescope.com"],
+      "matches": ["https://www.gradescope.com/*"],
       "js": ["content.js"]
     }
   ]

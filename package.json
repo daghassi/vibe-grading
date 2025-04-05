@@ -6,14 +6,16 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "watch": "webpack --watch --config webpack.config.js",
-    "copy-assets": "mkdir -p dist && cp src/*.html dist/ && cp src/**/*.png dist/ && cp src/manifest.json dist/",
+    "copy-assets": "mkdir -p dist && cp src/*.html dist/ && mkdir -p dist/icons && cp src/icons/*.png dist/icons/ && cp src/manifest.json dist/",
     "prebuild": "npm run copy-assets",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "",
-  "dependencies": {},
+  "dependencies": {
+    "groq-sdk": "^0.19.0"
+  },
   "devDependencies": {
     "webpack": "^5.98.0",
     "webpack-cli": "^6.0.1"
