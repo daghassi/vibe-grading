@@ -1,0 +1,20 @@
+{
+  "name": "Vibe Grading",
+  "description": "Full Self Grading (supervised) AI Grading for TAs and Students",
+  "version": "1.0",
+  "manifest_version": 3,
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["www.gradescope.com"],
+      "js": ["content.js"]
+    }
+  ]
+}
