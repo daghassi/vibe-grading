@@ -1,2 +1,3 @@
+![](./logo.png)
 # vibe-grading
-AI Grading assistant plugin for gradescope at Beaverhacks 2025
+AI Grading assistant plugin for Gradescope at BeaverHacks 2025
