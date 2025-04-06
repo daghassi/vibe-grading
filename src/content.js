@@ -190,6 +190,7 @@ vibeGradingButton.style.zIndex = "9999";
 vibeGradingButton.style.fontFamily = "sans-serif";
 vibeGradingButton.style.fontWeight = "bold";
 
+if (new URL(window.location.href).pathname.endsWith("/grade")) {
 vibeGradingButton.addEventListener("click", () => {
   main();
   vibeGradingButton.style.display = "none";
@@ -197,5 +198,5 @@ vibeGradingButton.addEventListener("click", () => {
 
 document.querySelector("body").appendChild(vibeGradingButton);
 
-if (new URL(window.location.href).pathname.endsWith("/grade")) {
+
 }
