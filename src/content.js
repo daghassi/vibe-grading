@@ -62,7 +62,7 @@ async function main() {
       role: "system",
       content: `Make sure to respond using the following json format for all reponses: {
         "feedback": "", // this is a html string of all feedback for the grader, including reasoning for the entire grading process
-        "grade": "", // the student's grade that they recieve
+        "grade": "", // the student's grade that they recieve make sure that the grade is the total grade and not the amount subtracted from the total
       }`,
     },
     {
