@@ -187,27 +187,18 @@ vibeGradingButton.innerHTML =
 vibeGradingButton.style.position = "fixed";
 vibeGradingButton.style.top = "80px";
 vibeGradingButton.style.left = "80px";
-vibeGradingButton.style.padding = "10px 20px";
+vibeGradingButton.style.width = "min-content";
+vibeGradingButton.style.height = "min-content";
 vibeGradingButton.style.fontSize = "16px";
-vibeGradingButton.style.backgroundColor = "#18472ECC";
-vibeGradingButton.style.color = "white";
 vibeGradingButton.style.border = "none";
 vibeGradingButton.style.borderRadius = "5px";
 vibeGradingButton.style.cursor = "pointer";
 vibeGradingButton.style.zIndex = "9999";
 vibeGradingButton.style.fontFamily = "sans-serif";
-vibeGradingButton.style.fontWeight = "bold";
 
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
-	vibeGradingButton.addEventListener("click", () => {
-		vibeGradingButton.innerHTML = `
-      <svg class="spin-icon" width="32px" height="32px" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="300" cy="300" r="280" stroke="white" stroke-width="40" fill="none" stroke-dasharray="80 100"/>
-      </svg>
-    `;
-
-		const styleTag = document.createElement("style");
-		styleTag.textContent = `
+	const styleTag = document.createElement("style");
+	styleTag.textContent = `
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -216,9 +207,16 @@ if (new URL(window.location.href).pathname.endsWith("/grade")) {
         animation: spin 1s linear infinite;
       }
     `;
-		document.head.appendChild(styleTag);
 
-		main();
+	document.head.appendChild(styleTag);
+	vibeGradingButton.addEventListener("click", () => {
+		vibeGradingButton.querySelector("svg").classList.add("spin-icon");
+		main().then(() => {
+			vibeGradingButton.style.display = "none";
+			vibeGradingButton.querySelector("svg").classList.remove(
+				"spin-icon",
+			);
+		});
 	});
 
 	document.body.appendChild(vibeGradingButton);
