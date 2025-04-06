@@ -127,7 +127,7 @@ async function main() {
       position: absolute;
       top: 5px;
       right: 10px;
-      background: transparent;
+      background: transparent; 
       border: none;
       font-size: 1.2em;
       font-weight: bold;
