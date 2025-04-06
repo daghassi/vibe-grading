@@ -62,7 +62,7 @@ async function main() {
       role: "system",
       content: `Make sure to respond using the following json format for all reponses: {
         "feedback": "", // this is a html string of all feedback for the grader, including reasoning for the entire grading process
-        "grade": "", // the student's grade that they recieve make sure that the grade is the total grade and not the amount subtracted from the total
+        "grade": "", // the student's grade that they recieve
       }`,
     },
     {
@@ -136,6 +136,27 @@ async function main() {
   });
 }
 
-if (new URL(window.location.href).pathname.endsWith("/grade")) {
+const vibeGradingButton = document.createElement("button");
+vibeGradingButton.innerText = "Vibe Grade!";
+vibeGradingButton.style.position = "fixed";
+vibeGradingButton.style.top = "80px";
+vibeGradingButton.style.left = "80px";
+vibeGradingButton.style.padding = "10px 20px";
+vibeGradingButton.style.fontSize = "16px";
+vibeGradingButton.style.backgroundColor = "#18472ECC";
+vibeGradingButton.style.color = "white";
+vibeGradingButton.style.border = "none";
+vibeGradingButton.style.borderRadius = "5px";
+vibeGradingButton.style.cursor = "pointer";
+vibeGradingButton.style.zIndex = "9999";
+vibeGradingButton.style.fontFamily = "sans-serif";
+vibeGradingButton.style.fontWeight = "bold";
+
+vibeGradingButton.addEventListener("click", () => {
   main();
+});
+
+document.querySelector("body").appendChild(vibeGradingButton);
+
+if (new URL(window.location.href).pathname.endsWith("/grade")) {
 }
