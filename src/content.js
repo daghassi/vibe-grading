@@ -10,6 +10,15 @@ async function main() {
   const dataDiv = document.querySelector("#main-content > div");
   const props = JSON.parse(dataDiv.dataset["reactProps"]);
   const urls = props.pages.map((page) => page.url);
+  if (
+    urls.find((u) => {
+      return u.includes("missing_placeholder");
+    }) != undefined
+  ) {
+    alert("no pages found, cannot vibe grade");
+    return;
+  }
+
   let questions_dict = {};
   const multiple_questions = props.question == undefined;
   if (multiple_questions) {
@@ -84,6 +93,6 @@ async function main() {
   document.querySelector("body").appendChild(newDiv);
 }
 
-if (window.location.href.endsWith("/grade")) {
+if (new URL(window.location.href).pathname.endsWith("/grade")) {
   main();
 }
