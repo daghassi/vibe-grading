@@ -191,12 +191,27 @@ vibeGradingButton.style.fontFamily = "sans-serif";
 vibeGradingButton.style.fontWeight = "bold";
 
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
-vibeGradingButton.addEventListener("click", () => {
-  main();
-  vibeGradingButton.style.display = "none";
-});
+  vibeGradingButton.addEventListener("click", () => {
+    vibeGradingButton.innerHTML = `
+      <svg class="spin-icon" width="32px" height="32px" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="300" cy="300" r="280" stroke="white" stroke-width="40" fill="none" stroke-dasharray="80 100"/>
+      </svg>
+    `;
+    
+    const styleTag = document.createElement("style");
+    styleTag.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .spin-icon {
+        animation: spin 1s linear infinite;
+      }
+    `;
+    document.head.appendChild(styleTag);
 
-document.querySelector("body").appendChild(vibeGradingButton);
+    main();
+  });
 
-
+  document.body.appendChild(vibeGradingButton);
 }
