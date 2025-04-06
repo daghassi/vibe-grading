@@ -1,115 +1,119 @@
 import Groq from "groq-sdk";
 async function main() {
-  const keys = await chrome.storage.sync.get(["api_key"]);
-  if (!keys.api_key) {
-    console.error("API key not found");
-  }
-  const { api_key } = keys;
+	const keys = await chrome.storage.sync.get(["api_key"]);
+	if (!keys.api_key) {
+		console.error("API key not found");
+	}
+	const { api_key } = keys;
 
+	const groq = new Groq({ apiKey: api_key, dangerouslyAllowBrowser: true });
 
+	const dataDiv = document.querySelector("#main-content > div");
+	const props = JSON.parse(dataDiv.dataset["reactProps"]);
+	const urls = props.pages.map((page) => page.url);
+	if (
+		urls.find((u) => {
+			return u.includes("missing_placeholder");
+		}) != undefined
+	) {
+		alert("no pages found, cannot vibe grade");
+		return;
+	}
 
-  const groq = new Groq({ apiKey: api_key, dangerouslyAllowBrowser: true });
+	let questions_dict = {};
+	const multiple_questions = props.question == undefined;
+	if (multiple_questions) {
+		for (let i = 0; i < props.questions.length; i++) {
+			const question = props.questions[i];
+			const q = {
+				id: question.id,
+				weight: question.weight,
+				type: question.type,
+				title: question.title,
+				scoring_type: question.scoring_type,
+				anchor: question.anchor,
+				rubric: [],
+			};
+			questions_dict[question.id] = q;
+		}
+	} else {
+		questions_dict["question"] = {
+			id: props.question.id,
+			weight: props.question.weight,
+			type: props.question.type,
+			title: props.question.title,
+			scoring_type: props.question.scoring_type,
+			anchor: props.question.anchor,
+			question_number: props.question.full_index,
+			rubric: [],
+		};
+	}
 
-  const dataDiv = document.querySelector("#main-content > div");
-  const props = JSON.parse(dataDiv.dataset["reactProps"]);
-  const urls = props.pages.map((page) => page.url);
-  if (
-    urls.find((u) => {
-      return u.includes("missing_placeholder");
-    }) != undefined
-  ) {
-    alert("no pages found, cannot vibe grade");
-    return;
-  }
+	for (let i = 0; i < props.rubric_items.length; i++) {
+		const rubric_item = props.rubric_items[i];
+		let q_id = multiple_questions ? rubric_item.question_id : "question";
+		questions_dict[q_id].rubric.push({
+			id: rubric_item.position,
+			description: rubric_item.description,
+			weight: rubric_item.weight,
+		});
+	}
+	let questions = Object.values(questions_dict);
+	let page_num = new Number(
+		document
+			.querySelector("main img")
+			.alt.replaceAll("Page ", "")
+			.split("/")[0],
+	);
+	let url = urls[page_num - 1];
 
-  let questions_dict = {};
-  const multiple_questions = props.question == undefined;
-  if (multiple_questions) {
-    for (let i = 0; i < props.questions.length; i++) {
-      const question = props.questions[i];
-      const q = {
-        id: question.id,
-        weight: question.weight,
-        type: question.type,
-        title: question.title,
-        scoring_type: question.scoring_type,
-        anchor: question.anchor,
-        rubric: [],
-      };
-      questions_dict[question.id] = q;
-    }
-  } else {
-    questions_dict["question"] = {
-      id: props.question.id,
-      weight: props.question.weight,
-      type: props.question.type,
-      title: props.question.title,
-      scoring_type: props.question.scoring_type,
-      anchor: props.question.anchor,
-      question_number: props.question.full_index,
-      rubric: [],
-    };
-  }
-
-  for (let i = 0; i < props.rubric_items.length; i++) {
-    const rubric_item = props.rubric_items[i];
-    let q_id = multiple_questions ? rubric_item.question_id : "question";
-    questions_dict[q_id].rubric.push({
-      id: rubric_item.position,
-      description: rubric_item.description,
-      weight: rubric_item.weight,
-    });
-  }
-  let questions = Object.values(questions_dict);
-  let page_num = new Number(
-    document
-      .querySelector("main img")
-      .alt.replaceAll("Page ", "")
-      .split("/")[0],
-  );
-  let url = urls[page_num - 1];
-
-  let messages = [
-    {
-      role: "system",
-      content: `Make sure to respond using the following json format for all reponses: {
+	let messages = [
+		{
+			role: "system",
+			content:
+				`Make sure to respond using the following json format for all reponses: {
         "feedback": "", // this is a html string of all feedback for the grader, including reasoning for the entire grading process
         "grade": "", // the student's grade that they recieve. make sure this is a number
         "rubric_id": "", // the id from the rubric number that best matches the assigned grade
         "rubric_description": "", // description from the rubric that best matches the assigned grade
       }`,
-    },
-    {
-      role: "user",
-      content: [
-        {
-          type: "text",
-          text: `Please grade as throughly as possible for the attached image on question '${questions[0].question_number}' using the following questions and rubric: \n ${JSON.stringify(
-            questions[0],
-          )}`,
-        },
-        {
-          type: "image_url",
-          image_url: {
-            url: url,
-          },
-        },
-      ],
-    },
-  ];
+		},
+		{
+			role: "user",
+			content: [
+				{
+					type: "text",
+					text:
+						`Please grade as throughly as possible for the attached image on question '${
+							questions[0].question_number
+						}' using the following questions and rubric: \n ${
+							JSON.stringify(
+								questions[0],
+							)
+						}`,
+				},
+				{
+					type: "image_url",
+					image_url: {
+						url: url,
+					},
+				},
+			],
+		},
+	];
 
-  let completion = await groq.chat.completions.create({
-    messages: messages,
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
-    response_format: {
-      type: "json_object",
-    },
-  });
-  let response = JSON.parse(completion.choices[0].message.content);
-  console.log(response);
+	let completion = await groq.chat.completions.create({
+		messages: messages,
+		model: "meta-llama/llama-4-scout-17b-16e-instruct",
+		response_format: {
+			type: "json_object",
+		},
+	});
+	let response = JSON.parse(completion.choices[0].message.content);
+	console.log(response);
 
-  const newDiv = document.createElement("div");
-  newDiv.innerHTML = `
+	const newDiv = document.createElement("div");
+	newDiv.innerHTML = `
   <div id="feedbackbox" style="
     z-index: 99999999;
     top: 10px;
@@ -138,22 +142,26 @@ async function main() {
       color: white;
     ">&times;</button>
     <h1 style="margin-top: 0;">AI Suggestion</h1>
-    <h3>Suggested Grade: ${response.grade}</h3>
+    <h2>Suggested Grade: </h2>
+	<p style="text-align: center;">${response.rubric_description}</p>
+	<h2>Reasoning:</h2>
+	<br />
     <pre style="white-space: pre-wrap;">${response.feedback}</pre>
   </div>
 `;
-  document.querySelector("body").appendChild(newDiv);
+	document.querySelector("body").appendChild(newDiv);
 
-  document.getElementById("xbutton").addEventListener("click", () => {
-    const box = document.getElementById("feedbackbox");
-    if (box) box.remove();
+	document.getElementById("xbutton").addEventListener("click", () => {
+		const box = document.getElementById("feedbackbox");
+		if (box) box.remove();
 
-    vibeGradingButton.style.display = "block";
-  });
+		vibeGradingButton.style.display = "block";
+	});
 }
 
 const vibeGradingButton = document.createElement("button");
-vibeGradingButton.innerHTML = `<svg width="64px" height="64px" viewBox="0 0 600 600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+vibeGradingButton.innerHTML =
+	`<svg width="64px" height="64px" viewBox="0 0 600 600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g transform="matrix(1.35856,0,0,1.30434,-97.7326,-107.729)">
         <ellipse cx="292.519" cy="302.532" rx="198.74" ry="207.001" style="fill:rgb(60,178,117);"/>
     </g>
@@ -191,15 +199,15 @@ vibeGradingButton.style.fontFamily = "sans-serif";
 vibeGradingButton.style.fontWeight = "bold";
 
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
-  vibeGradingButton.addEventListener("click", () => {
-    vibeGradingButton.innerHTML = `
+	vibeGradingButton.addEventListener("click", () => {
+		vibeGradingButton.innerHTML = `
       <svg class="spin-icon" width="32px" height="32px" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
         <circle cx="300" cy="300" r="280" stroke="white" stroke-width="40" fill="none" stroke-dasharray="80 100"/>
       </svg>
     `;
-    
-    const styleTag = document.createElement("style");
-    styleTag.textContent = `
+
+		const styleTag = document.createElement("style");
+		styleTag.textContent = `
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -208,10 +216,10 @@ if (new URL(window.location.href).pathname.endsWith("/grade")) {
         animation: spin 1s linear infinite;
       }
     `;
-    document.head.appendChild(styleTag);
+		document.head.appendChild(styleTag);
 
-    main();
-  });
+		main();
+	});
 
-  document.body.appendChild(vibeGradingButton);
+	document.body.appendChild(vibeGradingButton);
 }
