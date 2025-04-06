@@ -130,7 +130,7 @@ async function main() {
       position: absolute;
       top: 5px;
       right: 10px;
-      background: transparent; 
+      background: transparent;
       border: none;
       font-size: 1.2em;
       font-weight: bold;
@@ -195,7 +195,6 @@ vibeGradingButton.addEventListener("click", () => {
   vibeGradingButton.style.display = "none";
 });
 
-document.querySelector("body").appendChild(vibeGradingButton);
-
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
+  document.querySelector("body").appendChild(vibeGradingButton);
 }
