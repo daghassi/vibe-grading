@@ -8,7 +8,18 @@
     </head>
     <body>
         <h1>Vibe Grader - Settings</h1>
+        <label for="api-key">API Key:</label>
         <input type="password" id="api-key" placeholder="API Key" />
+        <div>
+            <label for="harshness">Harshness:</label>
+            <input
+                type="range"
+                id="harshness"
+                name="harshness"
+                min="1"
+                max="10"
+            />
+        </div>
         <button id="save-settings">Save Settings</button>
     </body>
 </html>

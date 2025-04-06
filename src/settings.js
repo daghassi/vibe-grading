@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  chrome.storage.sync.get(["api_key"], (data) => {
+  chrome.storage.sync.get(["api_key", "harshness"], (data) => {
     if (!data.api_key) {
       console.log("No API key found");
     } else {
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   document.querySelector("#save-settings").addEventListener("click", () => {
     const apiKey = document.getElementById("api-key").value;
-    chrome.storage.sync.set({ api_key: apiKey });
+    const harshness = document.getElementById("harshness").value;
+    chrome.storage.sync.set({ api_key: apiKey, harshness: harshness });
   });
 });

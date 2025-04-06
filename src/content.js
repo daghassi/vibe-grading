@@ -1,10 +1,13 @@
 import Groq from "groq-sdk";
 async function main() {
-  const keys = await chrome.storage.sync.get(["api_key"]);
-  if (!keys.api_key) {
+  const settings = await chrome.storage.sync.get(["api_key", "harshness"]);
+  if (!settings.api_key) {
     console.error("API key not found");
   }
-  const { api_key } = keys;
+  const { api_key, harshness } = settings;
+  if (harshness == undefined) {
+    harshness = 5;
+  }
   const groq = new Groq({ apiKey: api_key, dangerouslyAllowBrowser: true });
 
   const dataDiv = document.querySelector("#main-content > div");
@@ -71,7 +74,7 @@ async function main() {
       role: "system",
       content: `Make sure to respond using the following json format for all reponses: {
         "feedback": "", // this is a html string of all feedback for the grader, including reasoning for the entire grading process
-        "grade": "", // the student's grade that they recieve. make sure this is a number
+        "total_points": "", // the student's grade that they recieve. make sure this is a number
         "rubric_id": "", // the id from the rubric number that best matches the assigned grade
         "rubric_description": "", // description from the rubric that best matches the assigned grade
       }`,
@@ -81,7 +84,7 @@ async function main() {
       content: [
         {
           type: "text",
-          text: `Please grade as throughly as possible for the attached image on question '${questions[0].question_number}' using the following questions and rubric: \n ${JSON.stringify(
+          text: `Please grade as throughly as possible for the attached image on question '${questions[0].question_number}' using the following questions and rubric using harshness '${harshness}/10' (where 10/10 is the harshest and 1/10 is the lightest): \n ${JSON.stringify(
             questions[0],
           )}`,
         },
@@ -135,7 +138,7 @@ async function main() {
       color: white;
     ">&times;</button>
     <h1 style="margin-top: 0;">AI Suggestion</h1>
-    <h3>Suggested Grade: ${response.grade}</h3>
+    <h3>Suggested Grade: ${response.total_points}</h3>
     <pre style="white-space: pre-wrap;">${response.feedback}</pre>
   </div>
 `;
