@@ -64,7 +64,7 @@ async function main() {
         {
           type: "text",
           text: `Please grade the attached images using the following questions and rubric: ${JSON.stringify(
-            questions,
+            questions, 
           )}`,
         },
         ...urls.map((url) => ({
@@ -85,13 +85,45 @@ async function main() {
   console.log(completion.choices[0].message.content);
 
   const newDiv = document.createElement("div");
-  newDiv.innerHTML = `<div style="z-index: 99999999; top: 0; left: 0; position: fixed; width: 50vw; background: white; overflow: scroll;">
-		<h1>AI Suggestion</h1>
-	<pre style="text-wrap-mode: wrap;">${completion.choices[0].message.content}</pre>
+newDiv.innerHTML = `
+  <div id="feedbackbox" style="
+    z-index: 99999999; 
+    top: 10px; 
+    left: 10px; 
+    position: fixed; 
+    width: 40vw; 
+    max-height: 80vh;
+    background: rgba(255, 255, 255, 0.8); 
+    overflow: auto;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    font-size: 0.9em;
+  ">
+    <button id="xbutton" style="
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      color: #333;
+    ">&times;</button>
+    <h1 style="margin-top: 0;">AI Suggestion</h1>
+    <pre style="white-space: pre-wrap;">${completion.choices[0].message.content}</pre>
+  </div>
+`;
+document.querySelector("body").appendChild(newDiv);
 
-	</div>`;
-  document.querySelector("body").appendChild(newDiv);
-}
+document.getElementById("xbutton").addEventListener("click", () => {
+  const box = document.getElementById("feedbackbox");
+  if (box) box.remove();
+});
+
+}  
 
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
   main();
