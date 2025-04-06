@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "watch": "webpack --watch --config webpack.config.js",
-    "copy-assets": "mkdir -p dist && cp src/*.html dist/ && mkdir -p dist/icons && cp src/icons/*.png dist/icons/ && cp src/manifest.json dist/",
+    "copy-assets": "mkdir -p dist && cp src/*.html dist/ && cp src/*.css dist/ && mkdir -p dist/icons && cp src/icons/*.png dist/icons/ && cp src/manifest.json dist/",
     "prebuild": "npm run copy-assets",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -3,6 +3,7 @@
   "description": "Full Self Grading (supervised) AI Grading for TAs and Students",
   "version": "1.0",
   "manifest_version": 3,
+  "permissions": ["storage"],
   "options_ui": {
     "page": "settings.html",
     "open_in_tab": true
