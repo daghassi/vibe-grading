@@ -74,6 +74,14 @@ async function main() {
   });
 
   console.log(completion.choices[0].message.content);
+
+  const newDiv = document.createElement("div");
+  newDiv.innerHTML = `<div style="z-index: 99999999; top: 0; left: 0; position: fixed; width: 50vw; background: white; overflow: scroll;">
+		<h1>AI Suggestion</h1>
+	<pre style="text-wrap-mode: wrap;">${completion.choices[0].message.content}</pre>
+
+	</div>`;
+  document.querySelector("body").appendChild(newDiv);
 }
 
 if (window.location.href.endsWith("/grade")) {
