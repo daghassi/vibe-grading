@@ -144,6 +144,8 @@ async function main() {
   document.getElementById("xbutton").addEventListener("click", () => {
     const box = document.getElementById("feedbackbox");
     if (box) box.remove();
+
+    vibeGradingButton.style.display = "block";
   });
 }
 
@@ -187,6 +189,7 @@ vibeGradingButton.style.fontWeight = "bold";
 
 vibeGradingButton.addEventListener("click", () => {
   main();
+  vibeGradingButton.style.display = "none";
 });
 
 document.querySelector("body").appendChild(vibeGradingButton);
