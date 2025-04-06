@@ -59,12 +59,19 @@ async function main() {
 
   let messages = [
     {
+      role: "system",
+      content: `Make sure to respond using the following json format for all reponses: {
+        "feedback": "", // this is a html string of all feedback for the grader, including reasoning for the entire grading process
+        "grade": "", // the student's grade that they recieve
+      }`,
+    },
+    {
       role: "user",
       content: [
         {
           type: "text",
-          text: `Please grade the attached images using the following questions and rubric: ${JSON.stringify(
-            questions, 
+          text: `Please grade as throughly as possible for the attached images using the following questions and rubric: ${JSON.stringify(
+            questions,
           )}`,
         },
         ...urls.map((url) => ({
@@ -80,20 +87,24 @@ async function main() {
   let completion = await groq.chat.completions.create({
     messages: messages,
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    response_format: {
+      type: "json_object",
+    },
   });
-
-  console.log(completion.choices[0].message.content);
+  let response = JSON.parse(completion.choices[0].message.content);
+  console.log(response);
 
   const newDiv = document.createElement("div");
-newDiv.innerHTML = `
+  newDiv.innerHTML = `
   <div id="feedbackbox" style="
-    z-index: 99999999; 
-    top: 10px; 
-    left: 10px; 
-    position: fixed; 
-    width: 40vw; 
+    z-index: 99999999;
+    top: 10px;
+    left: 10px;
+    position: fixed;
+    width: 40vw;
     max-height: 80vh;
-    background: rgba(255, 255, 255, 0.8); 
+    background: rgba(24, 71, 46, 0.8);
+    color: white;
     overflow: auto;
     padding: 1em;
     border-radius: 8px;
@@ -113,17 +124,17 @@ newDiv.innerHTML = `
       color: #333;
     ">&times;</button>
     <h1 style="margin-top: 0;">AI Suggestion</h1>
-    <pre style="white-space: pre-wrap;">${completion.choices[0].message.content}</pre>
+    <h3>Suggested Grade: ${response.grade}</h3>
+    <pre style="white-space: pre-wrap;">${response.feedback}</pre>
   </div>
 `;
-document.querySelector("body").appendChild(newDiv);
+  document.querySelector("body").appendChild(newDiv);
 
-document.getElementById("xbutton").addEventListener("click", () => {
-  const box = document.getElementById("feedbackbox");
-  if (box) box.remove();
-});
-
-}  
+  document.getElementById("xbutton").addEventListener("click", () => {
+    const box = document.getElementById("feedbackbox");
+    if (box) box.remove();
+  });
+}
 
 if (new URL(window.location.href).pathname.endsWith("/grade")) {
   main();
