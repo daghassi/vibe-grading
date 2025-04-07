@@ -143,10 +143,9 @@ async function main() {
     ">&times;</button>
     <h1 style="margin-top: 0;">AI Suggestion</h1>
     <h2>Suggested Grade: </h2>
-	<p style="text-align: center;">${response.rubric_description}</p>
+	<p style="text-align: center; margin: 1em; border: solid white 2px; padding: 0.2em;">${response.rubric_description}</p>
 	<h2>Reasoning:</h2>
-	<br />
-    <pre style="white-space: pre-wrap;">${response.feedback}</pre>
+    <pre style="white-space: pre-wrap;margin: 1em;">${response.feedback}</pre>
   </div>
 `;
 	document.querySelector("body").appendChild(newDiv);
@@ -203,18 +202,42 @@ if (new URL(window.location.href).pathname.endsWith("/grade")) {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+	  @keyframes bounce {
+	    0%, 100% {
+	      transform: translateY(-25%);
+	      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+	    }
+	    50% {
+	      transform: none;
+	      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+	    }
+	  }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
+        }
+      }
+	  .pulse {	
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
       .spin-icon {
         animation: spin 1s linear infinite;
+      }
+	  .bounce {
+		animation: bounce 1s infinite;
       }
     `;
 
 	document.head.appendChild(styleTag);
 	vibeGradingButton.addEventListener("click", () => {
-		vibeGradingButton.querySelector("svg").classList.add("spin-icon");
+		let animation_type = ["bounce", "spin-icon", "pulse"];
+		animation_type =
+			animation_type[Math.floor(Math.random() * animation_type.length)];
+		vibeGradingButton.querySelector("svg").classList.add(animation_type);
 		main().then(() => {
 			vibeGradingButton.style.display = "none";
 			vibeGradingButton.querySelector("svg").classList.remove(
-				"spin-icon",
+				animation_type,
 			);
 		});
 	});
